@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title> 
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/iconfont/iconfont.css" rel="stylesheet"/>
+    <link href="css/previewImage.css" rel="stylesheet"/>
+    <style type="text/css">
+    	#draw-box{
+    		padding: .2rem;
+    		width: 100%;
+    		height: 100%; 
+    	}
+    	.img-box{
+			background-color: transparent;
+			border-color: #fff;
+			display: flex;
+			flex-wrap: wrap;
+			padding: 0 .3rem 1rem;
+		}
+		.img-box .img-box-sub{
+			position: relative;
+			
+		}
+		.img-box .img-frame{
+			overflow: hidden;
+			width: 1.3rem;
+			height: 1.3rem;
+			margin: .1rem;
+			border: 1px solid #ccc;
+			display: flex;
+			align-items: center;
+		}
+		.img-frame img{
+			width: 100%;
+			height: auto;
+		}
+		.img-delete{
+			position: absolute;
+			color: #E72B2B;
+			right: -.15rem;
+			top: -.15rem;
+			font-size: .4rem;
+			padding: .1rem;
+		}
+		.flex{ position: fixed;top: 2rem;right: 0;}
+    	.flex button{
+    		padding: .2rem .1rem .2rem .3rem;
+    		line-height: .3rem;
+    		font-size: .3rem;
+    		border-top-left-radius: 50px;
+    		border-bottom-left-radius: 50px;
+    		border: none;
+    	}
+    	.blue-light{background-color: #D3D3D3;}
+    	.blue-middle{background-color: #B0C4DE;}
+    	.blue-heavy{background-color: #ADD8E6;}
+    	.blue-light:active{border: none!important;background-color: #b2b2b2!important;}
+    	.blue-middle:active{border: none!important;background-color: #4682B4!important;}
+    	.blue-heavy:active{border: none!important;background-color: #00CED1!important;}
+    	.trash{
+    		position: fixed;
+    		font-size: .5rem;
+    		color: #fff;
+    		width: 1rem;
+    		height: 1rem;
+    		line-height: 1rem;
+    		text-align: center;
+    		border-radius: 50px;
+    		right: .5rem;
+    		bottom: .5rem;
+    		background-color: #FF6A6A;
+    	}
+    </style>
+</head>
+<body>
+	<div class="mui-content">
+		<div id="draw-box">
+		</div>
+		<div class="flex">
+			<button id="clearPrev" type="button" class="mui-btn mui-btn-blue mui-btn-block blue-light">撤销</button>
+			<button id="clearCanvas" type="button" class="mui-btn mui-btn-blue mui-btn-block blue-middle">清空</button>
+			<button id="saveCanvas" type="button" class="mui-btn mui-btn-blue mui-btn-block blue-heavy">保存</button>
+		</div>
+		<div class="img-box">
+			<div class="img-box-sub" v-for="(item,index) in imgArr">
+				<span @tap="delImg($event,index)" class="img-delete iconfont icon-quxiao"></span> 
+				<div class="img-frame">
+		    		<img :src="item" alt="暂无" data-preview-src="" data-preview-group="1"/>
+				</div>
+			</div>
+		</div>
+		<div @tap="deleteAllImgs" class="trash iconfont icon-iconfontshanchu"></div>
+	</div>
+</body>
+<script src="js/mui.min.js"></script>
+<script src="js/vue.min.js"></script>
+<script src="js/drawPanel.js"></script>
+<script src="js/mui.zoom.js"></script>
+<script src="js/mui.previewimage.js"></script>
+<script src="js/rem.js"></script>
+<script type="text/javascript" charset="utf-8">
+(function ($) {
+    var vm = new Vue({
+        el: ".mui-content",
+        data: {
+            imgArr: [], //图片
+        },
+        methods:{ 
+            delImg: function(e,i){
+            	e.preventDefault();
+            	this.imgArr.splice(i,1);
+            },
+            deleteAllImgs: function(){
+            	this.imgArr = [];
+            },
+        }
+    });
+    $.previewImage();
+    new drawFlexLine({  
+    	el: document.getElementById("draw-box"),//绘制canvas的父级div
+    	clearBtn: document.getElementById("clearCanvas"),//清除按钮
+    	prevBtn: document.getElementById("clearPrev"),//保存按钮
+    	saveBtn: document.getElementById("saveCanvas"),//保存按钮
+    },function(imgsrc,err){
+    	if(err == 'err'){
+    		mui.toast("请先签字再保存");
+    		return;
+    	}
+    	vm.imgArr = vm.imgArr.concat(imgsrc)
+    });
+    $.plusReady(function () {
+       plus.screen.lockOrientation('portrait-primary');
+    });
+})(mui)
+
+</script>
+</html>
